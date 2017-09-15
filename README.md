@@ -1,8 +1,8 @@
-# sell-app   高仿饿了么APP（vue--cli）
+# sell-app 高仿饿了么APP（vue--cli）
 
 > 模拟饿了么外卖APP通过官方vue- cli构建整个项目，这个是作为学习Vue的一个入门demo吧!
 
-#技术栈
+## 技术栈
 > Vue2.0+vue-router+vue-resource+es6+svg
 
 ## Build Setup
