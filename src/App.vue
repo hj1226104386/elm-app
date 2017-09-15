@@ -40,6 +40,7 @@
     min-width: 320px;
     max-width: 640px;
     height: 100%;
+    margin:0 auto;
   }
   .links{
     height: 40px;
