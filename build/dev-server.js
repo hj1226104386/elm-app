@@ -22,38 +22,39 @@ var autoOpenBrowser = !!config.dev.autoOpenBrowser
 // https://github.com/chimurai/http-proxy-middleware
 var proxyTable = config.dev.proxyTable
 
-var appData = require('../data.json');
-var seller = appData.seller;
-var goods = appData.goods;
-var ratings = appData.ratings;
-var app = express();
-var apiRouters = express.Router();
+var app = express()
+
+var appData = require('../data.json')
+var seller = appData.seller
+var goods = appData.goods
+var ratings = appData.ratings
+var apiRouters = express.Router()
 //卖家
-apiRouters.get('/goods',function (req,res) {
+apiRouters.get('/goods', function (req, res) {
   res.json({
-    errNum:0,
-    data:seller
+    errNum: 0,
+    data: goods,
+    msg: '我来自goods接口'
   })
-});
-apiRouters.get('/goods',function (req,res) {
+})
+apiRouters.get('/ratings', function (req, res) {
   res.json({
-    errNum:0,
-    data:goods
+    errNum: 0,
+    data: ratings,
+    msg: '我来自ratings接口'
   })
-});
-apiRouters.get('/ratings',function (req,res) {
+})
+apiRouters.get('/seller', function (req, res) {
   res.json({
-    errNum:0,
-    data:ratings
+    errNum: 0,
+    data: seller,
+    msg: '我来自seller接口'
   })
-});
-app.use('/api',apiRouters);
+})
 
+app.use('/api', apiRouters)
 
-
-var compiler = webpack(webpackConfig);
-
-
+var compiler = webpack(webpackConfig)
 
 var devMiddleware = require('webpack-dev-middleware')(compiler, {
   publicPath: webpackConfig.output.publicPath,
@@ -67,7 +68,7 @@ var hotMiddleware = require('webpack-hot-middleware')(compiler, {
 // force page reload when html-webpack-plugin template changes
 compiler.plugin('compilation', function (compilation) {
   compilation.plugin('html-webpack-plugin-after-emit', function (data, cb) {
-    hotMiddleware.publish({ action: 'reload' })
+    hotMiddleware.publish({action: 'reload'})
     cb()
   })
 })
@@ -76,7 +77,7 @@ compiler.plugin('compilation', function (compilation) {
 Object.keys(proxyTable).forEach(function (context) {
   var options = proxyTable[context]
   if (typeof options === 'string') {
-    options = { target: options }
+    options = {target: options}
   }
   app.use(proxyMiddleware(options.filter || context, options))
 })
