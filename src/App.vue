@@ -12,7 +12,7 @@
         <router-link to='/seller'>商家</router-link>
       </li>
     </ul>
-    <router-view></router-view>
+    <router-view :header-data='headerData'></router-view>
   </div>
 </template>
 
@@ -35,7 +35,6 @@
         if (res.body.errNum === 0) {
           // Object.assign();深拷贝
           this.headerData = Object.assign({}, res.body.data)
-          console.log(this.headerData)
         }
       })
     }
@@ -45,8 +44,6 @@
 
 <style scoped>
   #app {
-    min-width: 320px;
-    max-width: 640px;
     height: 100%;
     margin: 0 auto;
   }

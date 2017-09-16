@@ -22,12 +22,16 @@
         <span>{{calcLength}}个</span>
         <i>></i>
       </div>
+      <div class="background">
+        <img :src="headerData.avatar">
+      </div>
     </div>
     <div class="headBottom" @click='showDetail'>
       <i></i>
       <span>{{headerData.bulletin}}</span>
       <s>></s>
     </div>
+    <!--蒙层-->
     <div class="sellerDetail animated bounceInRight" v-show='ifShowDetail'>
       <h2>{{headerData.name}}</h2>
       <div class="showStar"></div>
@@ -172,7 +176,19 @@
     bottom: 14px;
     right: 12px;
   }
-
+  .background{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top:0;
+    left:0;
+    z-index: -1;
+    filter:blur(10px);/*滤镜：模糊*/
+  }
+  .background>img{
+    width: 100%;
+    height: 100%;
+  }
   .headBottom {
     height: 28px;
     background-color: rgba(0, 0, 0, .5);
@@ -215,6 +231,7 @@
     position: fixed;
     top: 0;
     left: 0;
+    z-index: 2;
     background-color: rgba(7, 17, 27, .8);
     padding: 64px 36px 32px;
   }
