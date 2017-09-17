@@ -1,13 +1,13 @@
 <template>
   <div id="goods">
-    <div class="sideMenu">
-      <ul>
+    <div class="sideMenu menuWrapper" ref='menuWrapper'>
+      <ul class='content'>
         <li v-for='item in goods'>
           <span>{{item.name}}</span>
         </li>
       </ul>
     </div>
-    <div class="contentMenu">
+    <div class="contentMenu foodsWrapper" ref='foodsWrapper'>
       <ul class='typeList'>
         <li v-for='item in goods'>
           <h2 class='foodTitle'>{{item.name}}</h2>
@@ -43,12 +43,15 @@
   </div>
 </template>
 <script>
+  import BScroll from 'better-scroll'
   export default {
     name: 'goods',
     props: ['headerData'],
     data () {
       return {
-        goods: ''
+        goods: '',
+        menuScroll: '',
+        foodsScroll: ''
       }
     },
     created () {
@@ -56,6 +59,10 @@
         console.log(res.body.data)
         if (res.body.errNum === 0) {
           this.goods = res.body.data
+          this.$nextTick(() => {
+            this.menuScroll = new BScroll(this.$refs.menuWrapper, {})
+            this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {})
+          })
         }
       })
     }
@@ -126,91 +133,107 @@
   }
 
   .foodList {
-    padding:0 18px;
+    padding: 0 18px;
   }
 
   .foodList > li {
     height: 112px;
     width: 100%;
-    border-bottom: 1px solid rgba(7, 17, 27,.1);
+    border-bottom: 1px solid rgba(7, 17, 27, .1);
     padding: 18px 0;
     display: flex;
   }
-  .foodList > li:last-child{
-    border:none;
+
+  .foodList > li:last-child {
+    border: none;
   }
-  .goodPic{
+
+  .goodPic {
     width: 76px;
     height: 76px;
-    flex:0 0 76px;
+    flex: 0 0 76px;
   }
-  .goodPic>img{
+
+  .goodPic > img {
     width: 100%;
     height: 100%;
   }
-  .goodDetail{
+
+  .goodDetail {
     margin-left: 10px;
-    flex:1;
+    flex: 1;
   }
-  .goodDetail>h2{
-    font-size:14px;
-    color:rgb(7,17,27);
-    line-height:14px;
+
+  .goodDetail > h2 {
+    font-size: 14px;
+    color: rgb(7, 17, 27);
+    line-height: 14px;
     margin-top: 2px;
   }
-  .goodDetail>.desc{
-    font-size:10px;
-    color:rgb(147,153,159);
-    line-height:10px;
+
+  .goodDetail > .desc {
+    font-size: 10px;
+    color: rgb(147, 153, 159);
+    line-height: 10px;
     margin: 8px 0;
   }
-  .goodDetail>.sellNum{
-    font-size:10px;
-    color:rgb(147,153,159);
-    line-height:10px;
+
+  .goodDetail > .sellNum {
+    font-size: 10px;
+    color: rgb(147, 153, 159);
+    line-height: 10px;
     margin: 8px 0;
   }
-  .price{
+
+  .price {
     overflow: hidden;
   }
-  .goodPrice{
-    line-height:24px;
+
+  .goodPrice {
+    line-height: 24px;
     float: left;
   }
-  .goodPrice>span{
-    fotn-size:14px;
-    color:red;
-    font-weight:700;
-    line-height:24px;
+
+  .goodPrice > span {
+    fotn-size: 14px;
+    color: red;
+    font-weight: 700;
+    line-height: 24px;
     margin-right: 8px;
   }
-  .goodPrice>span>i{
-    font-size:10px;
-    font-style:normal;
+
+  .goodPrice > span > i {
+    font-size: 10px;
+    font-style: normal;
   }
-  .goodPrice>s{
-    font-size:10px;
-    color:rgb(147,153,159);
-    font-weight:normal;
-    line-height:24px;
+
+  .goodPrice > s {
+    font-size: 10px;
+    color: rgb(147, 153, 159);
+    font-weight: normal;
+    line-height: 24px;
     vertical-align: top;
   }
-  .buyBtn{
+
+  .buyBtn {
     float: right;
-    line-height:24px;
+    line-height: 24px;
   }
-  .buyBtn>i{
-    font-size:23px;
-    color:rgb(0,160,220);
+
+  .buyBtn > i {
+    font-size: 23px;
+    color: rgb(0, 160, 220);
     vertical-align: middle;
   }
-  .buyBtn>i:first-child{
-    font-size:21px;
+
+  .buyBtn > i:first-child {
+    font-size: 21px;
   }
-  .buyBtn>span{
-    font-size:10px;
-    color:#ccc;
+
+  .buyBtn > span {
+    font-size: 10px;
+    color: #ccc;
     vertical-align: middle;
-    margin:0 2px;
+    margin: 0 2px;
   }
 </style>
