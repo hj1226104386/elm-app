@@ -1,7 +1,8 @@
 <template>
   <div id="footer">
     <div class="cartIcon">
-      <span class='iconfont icon-cart'></span>
+      <i class='iconfont icon-cart'></i>
+      <span class='orderNum'>66</span>
     </div>
     <h4 class=price>￥66</h4>
     <p class='description'>另需配送费￥4元</p>
@@ -57,11 +58,27 @@
     transform:translate(-50%,-50%);
     z-index: 1;
   }
-  .cartIcon>span{
+  .cartIcon>i{
     font-size:24px;
     color:rgba(255,255,255,.4);
     position: relative;
     z-index: 2;
+  }
+  .orderNum{
+    display: block;
+    height: 16px;
+    min-width:24px;
+    font-size:9px;
+    fong-weight:700;
+    color:#fff;
+    line-height:16px;
+    text-align: center;
+    position: absolute;
+    top:0;
+    left:33px;
+    padding: 0 6px;
+    border-radius:10px;
+    background-color: red;
   }
   .price{
     float: left;

@@ -230,7 +230,7 @@
   .goodDetail > .desc {
     font-size: 10px;
     color: rgb(147, 153, 159);
-    line-height: 10px;
+    line-height: 11px;
     margin: 8px 0;
   }
 
