@@ -2,14 +2,14 @@
   <div id="goods">
     <div class="sideMenu menuWrapper" ref='menuWrapper'>
       <ul class='content'>
-        <li v-for='item in goods'>
+        <li v-for='(item,index) in goods' :class="{'current':calcIndex===index}" @click='checkFoodType(index)'>
           <span>{{item.name}}</span>
         </li>
       </ul>
     </div>
     <div class="contentMenu foodsWrapper" ref='foodsWrapper'>
       <ul class='typeList'>
-        <li v-for='item in goods'>
+        <li v-for='item in goods' class='food-list-hook'>
           <h2 class='foodTitle'>{{item.name}}</h2>
           <ul class="foodList">
             <li v-for='one in item.foods'>
@@ -44,14 +44,15 @@
 </template>
 <script>
   import BScroll from 'better-scroll'
+
   export default {
     name: 'goods',
     props: ['headerData'],
     data () {
       return {
         goods: '',
-        menuScroll: '',
-        foodsScroll: ''
+        listHeight: [], // 每个分类的li元素高度
+        scrollY: ''// 实时存放右侧的scrollTop值
       }
     },
     created () {
@@ -59,16 +60,71 @@
         console.log(res.body.data)
         if (res.body.errNum === 0) {
           this.goods = res.body.data
+          // dom结构加载完成
           this.$nextTick(() => {
-            this.menuScroll = new BScroll(this.$refs.menuWrapper, {})
-            this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {})
+            // 初始化scroll
+            this.initScroll()
+            // 计算每个li的所在的高度
+            this.calcHeight()
           })
         }
       })
+    },
+    methods: {
+      initScroll () {
+        this.menuScroll = new BScroll(this.$refs.menuWrapper, {
+          click: true // 不阻止click事件
+        })
+        this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
+          click: true, // 不阻止click事件
+          probeType: 3 // 滑动过程中派发scroll事件
+        })
+        // 动态获取y值
+        this.foodsScroll.on('scroll', (pos) => {
+          this.scrollY = Math.abs(Math.round(pos.y)) // 实时保存y值
+        })
+      },
+      calcHeight () { // 计算每个分类的li元素在页面的高度
+        let liList = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook')
+        let height = 0 // 初始高度
+        this.listHeight.push(height) // 先加入初始高度，也就是第一个
+        // 通过循环每个li的dom结构，将每一个li的高度依次累计，达到计算每个li所在页面的高度
+        for (let i = 0; i < liList.length; i++) {
+          let item = liList[i]
+          height += item.clientHeight
+          this.listHeight.push(height)
+        }
+      },
+      checkFoodType (index) { // 点击左侧，右侧同步滑动到对应位置
+        // 使用better-scroll的方法，滚动到相应位置
+        let liList = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook')
+        var currentLi = liList[index]
+        this.foodsScroll.scrollToElement(currentLi, 300)
+      }
+    },
+    computed: {
+      calcIndex () {
+        for (let i = 0; i < this.listHeight.length; i++) {
+          var item = this.listHeight[i]
+          var item2 = this.listHeight[i + 1]
+          // y的值在某个区间中
+          if (!item2 || (this.scrollY >= item && this.scrollY < item2)) {
+            return i
+          }
+        }
+        return 0 // 都不符合，则说明在滚动到第一个了
+      }
     }
   }
 </script>
 <style scoped>
+  /*公共样式*/
+  .current {
+    background-color: #00a0dc !important;
+  }
+  .current>span{
+    color:#fff!important;
+  }
   #goods {
     width: 100%;
     display: flex;

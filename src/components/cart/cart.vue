@@ -75,9 +75,9 @@
   }
   .description{
     float: left;
-    font-size:16px;
+    font-size:14px;
     color:rgba(255,255,255,.4);
-    font-weight:700;
+    font-weight:500;
     line-height:46px;
     padding-left: 12px;
   }
@@ -88,7 +88,7 @@
     padding:0 8px;
     text-align: center;
     line-height:46px;
-    font-size:12px;
+    font-size:16px;
     color:rgba(255,255,255,.4);
     font-weight:bold;
     background-color: rgba(255,255,255,.2);
