@@ -13,13 +13,11 @@
       </li>
     </ul>
     <router-view :header-data='headerData'></router-view>
-    <v-cart :header-data='headerData'></v-cart>
   </div>
 </template>
 
 <script>
   import header from './components/header/header.vue'
-  import cart from './components/cart/cart.vue'
 
   export default {
     name: 'app',
@@ -30,14 +28,14 @@
     },
     // 定义子组件
     components: {
-      'v-header': header,
-      'v-cart': cart
+      'v-header': header
     },
     created () {
       this.$http.get('/api/seller').then((res) => {
         if (res.body.errNum === 0) {
           // Object.assign();深拷贝
           this.headerData = Object.assign({}, res.body.data)
+          console.log(this.headerData)
         }
       })
     }

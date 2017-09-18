@@ -2,7 +2,7 @@
   <div id="goods">
     <div class="sideMenu menuWrapper" ref='menuWrapper'>
       <ul class='content'>
-        <li v-for='(item,index) in goods' :class="{'current':calcIndex===index}" @click='checkFoodType(index)'>
+        <li v-for='(item,index) in goods' :class="{'current' : calcIndex===index}" @click='checkFoodType(index)'>
           <span>{{item.name}}</span>
         </li>
       </ul>
@@ -40,10 +40,12 @@
         </li>
       </ul>
     </div>
+    <v-cart :header-data="headerData"></v-cart>
   </div>
 </template>
 <script>
   import BScroll from 'better-scroll'
+  import cart from '../cart/cart.vue'
 
   export default {
     name: 'goods',
@@ -55,9 +57,11 @@
         scrollY: ''// 实时存放右侧的scrollTop值
       }
     },
+    components: {
+      'v-cart': cart
+    },
     created () {
       this.$http.get('/api/goods').then((res) => {
-        console.log(res.body.data)
         if (res.body.errNum === 0) {
           this.goods = res.body.data
           // dom结构加载完成
@@ -122,9 +126,11 @@
   .current {
     background-color: #00a0dc !important;
   }
-  .current>span{
-    color:#fff!important;
+
+  .current > span {
+    color: #fff !important;
   }
+
   #goods {
     width: 100%;
     display: flex;
