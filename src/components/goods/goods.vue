@@ -29,9 +29,9 @@
                     <s v-if='one.oldPrice'>¥{{one.oldPrice}}</s>
                   </p>
                   <div class="buyBtn">
-                    <i class='iconfont icon-reduce'></i>
-                    <span>1</span>
-                    <i class='iconfont icon-add'></i>
+                    <i class='iconfont icon-reduce' v-show='one.count' @click='reduce(one)'></i>
+                    <span>{{calcCount(one.count)}}</span>
+                    <i class='iconfont icon-add' @click="add(one)"></i>
                   </div>
                 </div>
               </div>
@@ -40,12 +40,10 @@
         </li>
       </ul>
     </div>
-    <v-cart :header-data="headerData"></v-cart>
   </div>
 </template>
 <script>
   import BScroll from 'better-scroll'
-  import cart from '../cart/cart.vue'
 
   export default {
     name: 'goods',
@@ -54,16 +52,16 @@
       return {
         goods: '',
         listHeight: [], // 每个分类的li元素高度
-        scrollY: ''// 实时存放右侧的scrollTop值
+        scrollY: '', // 实时存放右侧的scrollTop值
+        totalMoney: 0, // 计算订单总额
+        selectFoods: []
       }
-    },
-    components: {
-      'v-cart': cart
     },
     created () {
       this.$http.get('/api/goods').then((res) => {
         if (res.body.errNum === 0) {
           this.goods = res.body.data
+          console.log(this.goods)
           // dom结构加载完成
           this.$nextTick(() => {
             // 初始化scroll
@@ -72,6 +70,12 @@
             this.calcHeight()
           })
         }
+      })
+    },
+    mounted () {
+      // 确保dom渲染完成
+      this.$nextTick(function () {
+        console.log(this.selectFoods)
       })
     },
     methods: {
@@ -99,11 +103,40 @@
           this.listHeight.push(height)
         }
       },
-      checkFoodType (index) { // 点击左侧，右侧同步滑动到对应位置
+      checkFoodType (index) {
+        // 点击左侧，右侧同步滑动到对应位置
         // 使用better-scroll的方法，滚动到相应位置
         let liList = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook')
         var currentLi = liList[index]
         this.foodsScroll.scrollToElement(currentLi, 300)
+      },
+      calcCount (count) {
+        if (count === 0) {
+          return ''
+        } else {
+          return count
+        }
+      },
+      add (one) { // 添加订单
+        if (!one.count) {
+          this.$set(one, 'count', 1)
+        } else {
+          one.count++
+          console.log(this.goods)
+        }
+        this.totalMoney += one.price
+        // 请求计算总金额
+        this.$store.commit('currentTotalMoney', this.totalMoney)
+      },
+      reduce (one) {
+        if (one.count === 1) {
+          one.count = 0
+        } else {
+          one.count--
+        }
+        this.totalMoney -= one.price
+        // 请求计算总金额
+        this.$store.commit('currentTotalMoney', this.totalMoney)
       }
     },
     computed: {
