@@ -74,7 +74,7 @@
       }
     },
     computed: {
-      calcLength: function () {
+      calcLength: function () { // 计算商家支持活动个数
         if (this.headerData.supports) {
           return this.headerData.supports.length
         }
@@ -231,7 +231,7 @@
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 2;
+    z-index: 55;
     background-color: rgba(7, 17, 27, .8);
     padding: 64px 36px 32px;
   }

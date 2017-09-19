@@ -1,6 +1,6 @@
 <template>
   <div class="footerWrapper">
-    <div class="footer">
+    <div class="footer" @click='toggleList'>
       <div class="cartIcon" :class="{blueCircle:calcTotalMoney>0}">
         <i class='iconfont icon-cart'></i>
         <span class='orderNum' v-if='totalNum>0'>{{totalNum}}</span>
@@ -9,69 +9,14 @@
       <p class='description'>另需配送费￥{{headerData.deliveryPrice || 0}}元</p>
       <div class="toPay" :class="{greenBg:lessMoney}" @click='goToPay'>{{showText}}</div>
     </div>
-    <div class="selectFoodList">
-      <div class="cartList">
+    <div class="selectFoodMask" v-show='show' transition="fade" @click='closeList'>
+      <div class="cartList animated bounceInUp" @click.stop='showList'>
         <div class="listHeader">
           <h2>购物车</h2>
           <span class='emptyList'>清空</span>
         </div>
         <div class="listWrapper">
           <ul class='list' ref='foodList'>
-            <li>
-              <p class='foodName'>莲子核桃黑米粥</p>
-              <div class="selectBtn">
-                <span class="price">￥10</span>
-                <div class="btns">
-                  <i class='iconfont icon-reduce'></i>
-                  <span>1</span>
-                  <i class='iconfont icon-add'></i>
-                </div>
-              </div>
-            </li>
-            <li>
-              <p class='foodName'>莲子核桃黑米粥</p>
-              <div class="selectBtn">
-                <span class="price">￥10</span>
-                <div class="btns">
-                  <i class='iconfont icon-reduce'></i>
-                  <span>1</span>
-                  <i class='iconfont icon-add'></i>
-                </div>
-              </div>
-            </li>
-            <li>
-              <p class='foodName'>莲子核桃黑米粥</p>
-              <div class="selectBtn">
-                <span class="price">￥10</span>
-                <div class="btns">
-                  <i class='iconfont icon-reduce'></i>
-                  <span>1</span>
-                  <i class='iconfont icon-add'></i>
-                </div>
-              </div>
-            </li>
-            <li>
-              <p class='foodName'>莲子核桃黑米粥</p>
-              <div class="selectBtn">
-                <span class="price">￥10</span>
-                <div class="btns">
-                  <i class='iconfont icon-reduce'></i>
-                  <span>1</span>
-                  <i class='iconfont icon-add'></i>
-                </div>
-              </div>
-            </li>
-            <li>
-              <p class='foodName'>莲子核桃黑米粥</p>
-              <div class="selectBtn">
-                <span class="price">￥10</span>
-                <div class="btns">
-                  <i class='iconfont icon-reduce'></i>
-                  <span>1</span>
-                  <i class='iconfont icon-add'></i>
-                </div>
-              </div>
-            </li>
             <li>
               <p class='foodName'>莲子核桃黑米粥</p>
               <div class="selectBtn">
@@ -120,12 +65,22 @@
     data () {
       return {
         totalNum: 66,
-        showText: ''
+        showText: '',
+        show: false // 是否显示订单列表
       }
     },
     methods: {
       goToPay () {
         alert('结算总金额：' + this.calcTotalMoney)
+      },
+      toggleList () {
+        this.show = !this.show
+      },
+      showList () {
+        this.show = true
+      },
+      closeList () {
+        this.show = false
       }
     },
     computed: {
@@ -162,19 +117,21 @@
     color: #fff !important;
     background-color: lightgreen !important;
   }
-  .footerWrapper{
+
+  .footerWrapper {
     height: 46px;
     width: 100%;
     position: absolute;
     left: 0;
     bottom: 0;
   }
+
   .footer {
     height: 100%;
     width: 100%;
     position: absolute;
-    top:0;
-    left:0;
+    top: 0;
+    left: 0;
     z-index: 51;
     background-color: #141d27;
     padding-left: 12px;
@@ -265,9 +222,9 @@
   }
 
   /*选中的订单列表*/
-  .selectFoodList {
+  .selectFoodMask {
     width: 100%;
-    background-color: rgba(0,0,0,.7);
+    background-color: rgba(0, 0, 0, .7);
     blur: 10px;
     position: fixed;
     bottom: 46px;
@@ -348,6 +305,7 @@
 
   .selectBtn > .btns {
     display: inline-block;
+    width: 76px;
   }
 
   .btns > i {

@@ -30,7 +30,7 @@
                   </p>
                   <div class="buyBtn">
                     <i class='iconfont icon-reduce' v-show='one.count' @click='reduce(one)'></i>
-                    <span>{{calcCount(one.count)}}</span>
+                    <span>{{one.count}}</span>
                     <i class='iconfont icon-add' @click="add(one)"></i>
                   </div>
                 </div>
@@ -79,7 +79,7 @@
       })
     },
     methods: {
-      initScroll () {
+      initScroll () { // 初始化BSscroll
         this.menuScroll = new BScroll(this.$refs.menuWrapper, {
           click: true // 不阻止click事件
         })
@@ -110,33 +110,52 @@
         var currentLi = liList[index]
         this.foodsScroll.scrollToElement(currentLi, 300)
       },
-      calcCount (count) {
-        if (count === 0) {
-          return ''
-        } else {
-          return count
-        }
-      },
       add (one) { // 添加订单
         if (!one.count) {
           this.$set(one, 'count', 1)
         } else {
           one.count++
-          console.log(this.goods)
         }
         this.totalMoney += one.price
         // 请求计算总金额
         this.$store.commit('currentTotalMoney', this.totalMoney)
+        // 重新汇总所有的订单
+        this.calcSelectFoods(one, true)
       },
       reduce (one) {
         if (one.count === 1) {
-          one.count = 0
+          one.count = ''
         } else {
           one.count--
         }
         this.totalMoney -= one.price
         // 请求计算总金额
         this.$store.commit('currentTotalMoney', this.totalMoney)
+        // 重新汇总所有的订单
+        this.calcSelectFoods(one, false)
+      },
+      calcSelectFoods (one, add) { // 重新整理所有订单
+        // 不为空则需要判断是否已有
+        if (this.selectFoods.length !== 0) {
+          this.selectFoods.forEach(function (v, i) {
+            if (v.name === one.name) { // 同一笔订单
+              v.count = one.count
+            } else {
+              if (add) { // 添加订单
+                console.log('添加订单')
+                this.selectFoods.push(one)
+              } else { // 移除订单
+                console.log('移除订单')
+                this.selectFoods.slice(i, 1)
+              }
+            }
+          })
+        } else {
+          this.selectFoods.push(one)
+        }
+        // 通知vuex更新数据
+        this.$store.commit('resetSelectFoods', this.selectFoods)
+        console.log('最新订单列表：' + this.selectFoods)
       }
     },
     computed: {

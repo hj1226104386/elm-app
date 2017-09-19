@@ -23,6 +23,9 @@ const store = new Vuex.Store({
     },
     currentTotalMoney (state, money) {
       state.totolMoney = money
+    },
+    resetSelectFoods (state, newFoods) {
+      state.selectFoods = newFoods
     }
   },
   getters: {}
