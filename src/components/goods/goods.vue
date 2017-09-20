@@ -17,7 +17,7 @@
                 <img :src="one.image">
               </div>
               <div class="goodDetail">
-                <h2>皮蛋瘦肉粥配包子套餐</h2>
+                <h2>{{one.name}}</h2>
                 <p class='desc'>{{one.description}}</p>
                 <p class='sellNum'>
                   <span>月售{{one.sellCount}}份</span>
@@ -70,12 +70,6 @@
             this.calcHeight()
           })
         }
-      })
-    },
-    mounted () {
-      // 确保dom渲染完成
-      this.$nextTick(function () {
-        console.log(this.selectFoods)
       })
     },
     methods: {
@@ -135,27 +129,35 @@
         this.calcSelectFoods(one, false)
       },
       calcSelectFoods (one, add) { // 重新整理所有订单
-        // 不为空则需要判断是否已有
-        if (this.selectFoods.length !== 0) {
-          this.selectFoods.forEach(function (v, i) {
-            if (v.name === one.name) { // 同一笔订单
-              v.count = one.count
-            } else {
-              if (add) { // 添加订单
-                console.log('添加订单')
-                this.selectFoods.push(one)
-              } else { // 移除订单
-                console.log('移除订单')
-                this.selectFoods.slice(i, 1)
-              }
-            }
-          })
-        } else {
+        /**
+         * 1、判断是否有相同订单，有，则更新count
+         * 2、无相同订单，再判断是增加订单还是减少订单
+         * 3、添加订单，则push进去
+         * 4、移除订单，则slice掉
+         */
+          // 1、遍历判断是否有相同订单
+        let sameFlag = false // 默认数组中没有相同订单
+        var that = this
+        for (let i = 0; i < this.selectFoods.length; i++) {
+          let v = that.selectFoods[i]
+          if (v.name === one.name) { // 已有相同订单
+            v.count = one.count // 更新count
+            sameFlag = true
+          }
+        }
+        // 2、添加新订单
+        if (!sameFlag && add) { // 没有相同订单
           this.selectFoods.push(one)
         }
-        // 通知vuex更新数据
+        // 3、移除掉count为0的订单
+        this.selectFoods.forEach(function (v, i) {
+          if (!v.count) {
+            that.selectFoods.splice(i, 1)
+          }
+        })
+        // 4、通知vuex更新数据
         this.$store.commit('resetSelectFoods', this.selectFoods)
-        console.log('最新订单列表：' + this.selectFoods)
+        this.$store.commit('refreshAllFoods', this.foods)
       }
     },
     computed: {
@@ -169,6 +171,9 @@
           }
         }
         return 0 // 都不符合，则说明在滚动到第一个了
+      },
+      getAllFoods () { // 获取最新的allFoods
+        return this.$store.state.allFoods
       }
     }
   }

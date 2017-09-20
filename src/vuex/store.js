@@ -12,20 +12,24 @@ Vue.use(Vuex)
 // 构造vuex实例
 const store = new Vuex.Store({
   state: {
-    title: '我来自vuex状态管理器',
     totolMoney: 0,
-    selectFoods: [11, 222] // 选择的商品
+    allFoods: '', // 所有事物集合
+    selectFoods: [] // 订单集合
   },
   actions: {},
   mutations: {
-    changeTitle (state) {
-      state.title = '啊哈哈，我把title改成这样了'
-    },
     currentTotalMoney (state, money) {
       state.totolMoney = money
     },
-    resetSelectFoods (state, newFoods) {
+    resetSelectFoods (state, newFoods) { // 重置订单
       state.selectFoods = newFoods
+    },
+    clearSelectFodds (state) { // 清空购物车
+      state.selectFoods = []
+      state.totolMoney = 0
+    },
+    refreshAllFoods (state, allFoods) { // 更新所有食物(数据有改动)
+      state.allFoods = allFoods
     }
   },
   getters: {}

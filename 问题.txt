@@ -5,3 +5,4 @@
 5、better-scroll插件
 6、vue中ref绑定dom元素？
 7、左侧菜单和右侧的联动实现？
+8、初始化BScroll之前，元素一定要先显示出来，这是坑

@@ -1,51 +1,29 @@
 <template>
   <div class="footerWrapper">
-    <div class="footer" @click='toggleList'>
-      <div class="cartIcon" :class="{blueCircle:calcTotalMoney>0}">
+    <div class="footer">
+      <div class="cartIcon" :class="{blueCircle:calcTotalMoney>0}" @click='toggleList'>
         <i class='iconfont icon-cart'></i>
-        <span class='orderNum' v-if='totalNum>0'>{{totalNum}}</span>
+        <span class='orderNum' v-if='calcSelectFoodsNum>0'>{{calcSelectFoodsNum}}</span>
       </div>
       <h4 class='price'>￥{{calcTotalMoney}}</h4>
       <p class='description'>另需配送费￥{{headerData.deliveryPrice || 0}}元</p>
       <div class="toPay" :class="{greenBg:lessMoney}" @click='goToPay'>{{showText}}</div>
     </div>
-    <div class="selectFoodMask" v-show='show' transition="fade" @click='closeList'>
+    <div class="selectFoodMask" v-if='show' @click='closeList'>
       <div class="cartList animated bounceInUp" @click.stop='showList'>
         <div class="listHeader">
           <h2>购物车</h2>
-          <span class='emptyList'>清空</span>
+          <span class='emptyList' @click.stop='clearList'>清空</span>
         </div>
-        <div class="listWrapper">
-          <ul class='list' ref='foodList'>
-            <li>
-              <p class='foodName'>莲子核桃黑米粥</p>
+        <div class="listWrapper" ref='listsWrapper'>
+          <ul class='list'>
+            <li v-for='food in calcSelectFoods'>
+              <p class='foodName'>{{food.name}}</p>
               <div class="selectBtn">
-                <span class="price">￥10</span>
+                <span class="price">￥{{food.price}}</span>
                 <div class="btns">
-                  <i class='iconfont icon-reduce'></i>
-                  <span>1</span>
-                  <i class='iconfont icon-add'></i>
-                </div>
-              </div>
-            </li>
-            <li>
-              <p class='foodName'>莲子核桃黑米粥</p>
-              <div class="selectBtn">
-                <span class="price">￥10</span>
-                <div class="btns">
-                  <i class='iconfont icon-reduce'></i>
-                  <span>1</span>
-                  <i class='iconfont icon-add'></i>
-                </div>
-              </div>
-            </li>
-            <li>
-              <p class='foodName'>莲子核桃黑米粥</p>
-              <div class="selectBtn">
-                <span class="price">￥10</span>
-                <div class="btns">
-                  <i class='iconfont icon-reduce'></i>
-                  <span>1</span>
+                  <i class='iconfont icon-reduce' v-if='food.count'></i>
+                  <span>{{food.count}}</span>
                   <i class='iconfont icon-add'></i>
                 </div>
               </div>
@@ -59,12 +37,13 @@
 </template>
 
 <script type="text/ecmascript-6">
+  import BScroll from 'better-scroll'
+
   export default {
     name: 'cart',
     props: ['headerData'],
     data () {
       return {
-        totalNum: 66,
         showText: '',
         show: false // 是否显示订单列表
       }
@@ -74,18 +53,42 @@
         alert('结算总金额：' + this.calcTotalMoney)
       },
       toggleList () {
-        this.show = !this.show
+        if (!this.show && this.calcSelectFoods.length > 0) {
+          this.show = true // 这是个坑 一定要先让元素显示出来，再初始化
+          this.$nextTick(function () {
+            this.scroll = new BScroll(this.$refs.listsWrapper, {
+              click: true // 不阻止click事件
+            })
+          })
+        } else {
+          this.show = false
+        }
       },
       showList () {
         this.show = true
       },
       closeList () {
         this.show = false
+      },
+      clearList () { // 清空购物车
+        this.$store.commit('clearSelectFodds')
+        this.show = false
       }
     },
     computed: {
       calcTotalMoney () { // 计算订单总金额，要设置成计算属性
         return this.$store.state.totolMoney
+      },
+      calcSelectFoods () {
+        return this.$store.state.selectFoods
+      },
+      calcSelectFoodsNum () {
+        var num = 0
+        let selectFoods = this.$store.state.selectFoods
+        selectFoods.forEach(function (v, i) {
+          num += v.count
+        })
+        return num
       },
       lessMoney () {
         if (this.calcTotalMoney >= this.headerData.minPrice) { // 金额够了
@@ -241,8 +244,6 @@
     position: absolute;
     bottom: 0;
     left: 0;
-    display: flex;
-    flex-direction: column;
   }
 
   .cartList > .listHeader {
@@ -253,7 +254,6 @@
     padding: 0 18px;
     display: flex;
     justify-content: space-between;
-    flex: 0 0 40px;
   }
 
   .listHeader > h2 {
@@ -270,13 +270,12 @@
   }
 
   .listWrapper {
-    flex: 1;
+    height: 242px;
+    overflow: hidden;
   }
 
   .listWrapper > ul {
-    height: 100%;
     padding: 0 18px;
-    overflow: hidden;
   }
 
   .list > li {
