@@ -118,7 +118,7 @@
 
   .greenBg {
     color: #fff !important;
-    background-color: lightgreen !important;
+    background-color: #00B43C !important;
   }
 
   .footerWrapper {
