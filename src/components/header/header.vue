@@ -37,13 +37,15 @@
       <ul class="showStar">
         <li v-for="(one,index) in 5" :class="{starOn:index<onNum,starHalf:index>=onNum&&index<(onNum+halfNum),starOff:index>=(onNum+halfNum)}"></li>
       </ul>
-      <div class=" discountMsg
-        ">
+      <div class="discountMsg">
         <div class="discountTitle lineTitle">
           <h3>优惠信息</h3>
         </div>
         <ul class='discountList'>
-          <li v-for='one in calcArray'>{{one.description}}</li>
+          <li v-for='one in calcArray'>
+            <i :class="classMap[one.type]"></i>
+            <span>{{one.description}}</span>
+          </li>
         </ul>
     </div>
     <div class="sellerNotice">
@@ -64,6 +66,7 @@
     data () {
       return {
         ifShowDetail: false,
+        classMap: ['decrease', 'discount', 'guarantee', 'invoice', 'special'], // 图标类型
         onNum: 0, // 全星
         halfNum: 0, // 半星
         offNum: 0 // 置灰星
@@ -72,7 +75,6 @@
     props: ['headerData'],
     mounted () {
       this.calcStars()
-      console.log(this.headerData)
     },
     methods: {
       closeDetail: function () {
@@ -130,7 +132,26 @@
   .starOff {
     background: url("./star24_off@2x.png") no-repeat;
   }
+  /*活动图标*/
+  .decrease {
+    background: url("./decrease_4@2x.png") no-repeat;
+  }
 
+  .discount {
+    background: url("./discount_4@2x.png") no-repeat;
+  }
+
+  .guarantee {
+    background: url("./guarantee_4@2x.png") no-repeat;
+  }
+
+  .invoice {
+    background: url("./invoice_4@2x.png") no-repeat;
+  }
+
+  .special {
+    background: url("./special_4@2x.png") no-repeat;
+  }
   .headTop {
     height: 106px;
     position: relative;
@@ -355,7 +376,21 @@
     line-height: 12px;
     margin-bottom: 12px;
   }
-
+  .discountList > li>i{
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    background-size:cover;
+    margin-right: 6px;
+  }
+  .discountList > li>span{
+    font-size: 12px;
+    font-weight: 200;
+    line-height: 12px;
+    margin-bottom: 12px;
+    vertical-align: middle;
+  }
   .sellerNotice {
     margin-top: 28px;
   }
