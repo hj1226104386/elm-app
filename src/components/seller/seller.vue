@@ -122,9 +122,6 @@
           this.halfNum = 0
           this.offNum = 5 - integer - 1
         }
-        console.log(this.onNum)
-        console.log(this.halfNum)
-        console.log(this.offNum)
       }
     }
   }
@@ -226,7 +223,6 @@
     display: inline-block;
     width: 100px;
     height: 18px;
-    background-color:lightblue;
     vertical-align: middle;
   }
 

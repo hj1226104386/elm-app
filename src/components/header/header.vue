@@ -34,25 +34,28 @@
     <!--蒙层-->
     <div class="sellerDetail animated bounceInRight" v-show='ifShowDetail'>
       <h2>{{headerData.name}}</h2>
-      <div class="showStar"></div>
-      <div class="discountMsg">
+      <ul class="showStar">
+        <li v-for="(one,index) in 5" :class="{starOn:index<onNum,starHalf:index>=onNum&&index<(onNum+halfNum),starOff:index>=(onNum+halfNum)}"></li>
+      </ul>
+      <div class=" discountMsg
+        ">
         <div class="discountTitle lineTitle">
           <h3>优惠信息</h3>
         </div>
         <ul class='discountList'>
           <li v-for='one in calcArray'>{{one.description}}</li>
         </ul>
-      </div>
-      <div class="sellerNotice">
-        <div class="sellerNoticeTitle lineTitle">
-          <h3>商家公告</h3>
-        </div>
-        <p>{{headerData.bulletin}}</p>
-      </div>
-      <div class="closeDetail">
-        <span class='iconfont icon-delete' @click='closeDetail'></span>
-      </div>
     </div>
+    <div class="sellerNotice">
+      <div class="sellerNoticeTitle lineTitle">
+        <h3>商家公告</h3>
+      </div>
+      <p>{{headerData.bulletin}}</p>
+    </div>
+    <div class="closeDetail">
+      <span class='iconfont icon-delete' @click='closeDetail'></span>
+    </div>
+  </div>
   </div>
 </template>
 <script>
@@ -60,17 +63,41 @@
     name: 'header',
     data () {
       return {
-        msg: '我来自data数据模型',
-        ifShowDetail: false
+        ifShowDetail: false,
+        onNum: 0, // 全星
+        halfNum: 0, // 半星
+        offNum: 0 // 置灰星
       }
     },
     props: ['headerData'],
+    mounted () {
+      this.calcStars()
+      console.log(this.headerData)
+    },
     methods: {
       closeDetail: function () {
         this.ifShowDetail = false
       },
       showDetail: function () {
         this.ifShowDetail = true
+      },
+      calcStars () { // 计算star三种状态个数
+        let rate = this.headerData.score
+        let integer = Math.floor(rate) // 整数部分
+        let redundant = rate % integer // 余数部分
+        if (redundant === 0) { // 余数为0
+          this.onNum = integer
+          this.halfNum = 0
+          this.offNum = 5 - integer
+        } else if (redundant > 0 && redundant <= 0.5) {
+          this.onNum = integer
+          this.halfNum = 1
+          this.offNum = 5 - integer - 1
+        } else if (redundant > 0.5) {
+          this.onNum = integer + 1
+          this.halfNum = 0
+          this.offNum = 5 - integer - 1
+        }
       }
     },
     computed: {
@@ -91,6 +118,18 @@
 </script>
 <style scoped>
   @import "../../common/iconfont/iconfont.css";
+  /*评分星星*/
+  .starOn {
+    background: url("./star24_on@2x.png") no-repeat;
+  }
+
+  .starHalf {
+    background: url("./star24_half@2x.png") no-repeat;
+  }
+
+  .starOff {
+    background: url("./star24_off@2x.png") no-repeat;
+  }
 
   .headTop {
     height: 106px;
@@ -176,19 +215,22 @@
     bottom: 14px;
     right: 12px;
   }
-  .background{
+
+  .background {
     width: 100%;
     height: 100%;
     position: absolute;
-    top:0;
-    left:0;
+    top: 0;
+    left: 0;
     z-index: -1;
-    filter:blur(10px);/*滤镜：模糊*/
+    filter: blur(10px); /*滤镜：模糊*/
   }
-  .background>img{
+
+  .background > img {
     width: 100%;
     height: 100%;
   }
+
   .headBottom {
     height: 28px;
     background-color: rgba(0, 0, 0, .5);
@@ -247,7 +289,14 @@
   .sellerDetail > .showStar {
     width: 100%;
     height: 24px;
-    background-color: orange;
+    padding:0 60px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .showStar>li{
+    width: 24px;
+    height: 24px;
+    background-size:cover;
   }
 
   .discountMsg {
