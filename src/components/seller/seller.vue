@@ -6,9 +6,9 @@
           <h4>{{sellerMsg.name}}</h4>
           <div class="stars">
             <ul class="starDetail">
-              <li></li>
+              <li v-for="(one,index) in 5" :class="{starOn:index<onNum,starHalf:index>=onNum&&index<(onNum+halfNum),starOff:index>=(onNum+halfNum)}"></li>
             </ul>
-            <span class='selected'>（{{sellerMsg.ratingCount}}）</span>
+            <span class='selected'>({{sellerMsg.ratingCount}})</span>
             <span class='orderNum'>月售{{sellerMsg.sellCount}}单</span>
           </div>
           <dl class="collectThis">
@@ -71,12 +71,16 @@
         sellerMsg: '',
         classMap: ['decrease', 'discount', 'guarantee', 'invoice', 'special'], // 类型
         collect: false,  // 未收藏
-        collectText: '' // 是否显示‘已’
+        collectText: '', // 是否显示‘已’
+        onNum: 0, // 全星
+        halfNum: 0, // 半星
+        offNum: 0 // 置灰星
       }
     },
     created () {
       this.$http.get('/api/seller').then((res) => {
         this.sellerMsg = res.body.data
+        this.calcStars()
         // 确保DOM渲染完了再执行初始化
         this.$nextTick(function () {
           this.initBScroll()
@@ -100,6 +104,27 @@
           this.sellerMsg.ratingCount -= 1
           this.collectText = ''
         }
+      },
+      calcStars () { // 计算star三种状态个数
+        let rate = this.sellerMsg.score
+        let integer = Math.floor(rate) // 整数部分
+        let redundant = rate % integer // 余数部分
+        if (redundant === 0) { // 余数为0
+          this.onNum = integer
+          this.halfNum = 0
+          this.offNum = 5 - integer
+        } else if (redundant > 0 && redundant <= 0.5) {
+          this.onNum = integer
+          this.halfNum = 1
+          this.offNum = 5 - integer - 1
+        } else if (redundant > 0.5) {
+          this.onNum = integer + 1
+          this.halfNum = 0
+          this.offNum = 5 - integer - 1
+        }
+        console.log(this.onNum)
+        console.log(this.halfNum)
+        console.log(this.offNum)
       }
     }
   }
@@ -113,6 +138,20 @@
     color: rgb(240, 20, 20) !important;
   }
 
+  /*评分星星*/
+  .starOn {
+    background: url("./star24_on@2x.png") no-repeat;
+  }
+
+  .starHalf {
+    background: url("./star24_half@2x.png") no-repeat;
+  }
+
+  .starOff {
+    background: url("./star24_off@2x.png") no-repeat;
+  }
+
+  /*活动图标*/
   .decrease {
     background: url("./decrease_4@2x.png") no-repeat;
   }
@@ -147,7 +186,8 @@
     position: absolute;
     top: 174px;
     bottom: 46px;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
   .sellerMsg {
@@ -185,9 +225,17 @@
   .stars > .starDetail {
     display: inline-block;
     width: 100px;
-    height: 20px;
-    background-color: orange;
+    height: 18px;
+    background-color:lightblue;
     vertical-align: middle;
+  }
+
+  .starDetail > li {
+    float: left;
+    height: 18px;
+    width: 18px;
+    background-size:cover;
+    margin-right: 2px;
   }
 
   .stars > span {
@@ -279,7 +327,7 @@
     height: 16px;
     vertical-align: middle;
     margin-right: 6px;
-    background-size:cover;
+    background-size: cover;
   }
 
   .activityList > li > span {

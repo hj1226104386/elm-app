@@ -44,7 +44,7 @@
     props: ['headerData'],
     data () {
       return {
-        showText: '',
+        showText: '￥' + (this.headerData.minPrice || 0) + '起送',
         show: false // 是否显示订单列表
       }
     },
@@ -95,7 +95,11 @@
           this.showText = '马上结算'
           return true
         } else {
-          this.showText = '￥' + (this.headerData.minPrice || 0) + '起送'
+          if (this.calcTotalMoney > 0) {
+            this.showText = '差' + (this.headerData.minPrice - this.calcTotalMoney) + '元起送'
+          } else {
+            this.showText = '￥' + (this.headerData.minPrice || 0) + '起送'
+          }
           return false
         }
       }
