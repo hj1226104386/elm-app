@@ -34,9 +34,9 @@
     <!--蒙层-->
     <div class="sellerDetail animated bounceInRight" v-show='ifShowDetail'>
       <h2>{{headerData.name}}</h2>
-      <ul class="showStar">
-        <li v-for="(one,index) in 5" :class="{starOn:index<onNum,starHalf:index>=onNum&&index<(onNum+halfNum),starOff:index>=(onNum+halfNum)}"></li>
-      </ul>
+      <div class="starWrapper">
+        <v-star :score="headerData.score"></v-star>
+      </div>
       <div class="discountMsg">
         <div class="discountTitle lineTitle">
           <h3>优惠信息</h3>
@@ -47,22 +47,27 @@
             <span>{{one.description}}</span>
           </li>
         </ul>
-    </div>
-    <div class="sellerNotice">
-      <div class="sellerNoticeTitle lineTitle">
-        <h3>商家公告</h3>
       </div>
-      <p>{{headerData.bulletin}}</p>
+      <div class="sellerNotice">
+        <div class="sellerNoticeTitle lineTitle">
+          <h3>商家公告</h3>
+        </div>
+        <p>{{headerData.bulletin}}</p>
+      </div>
+      <div class="closeDetail">
+        <span class='iconfont icon-delete' @click='closeDetail'></span>
+      </div>
     </div>
-    <div class="closeDetail">
-      <span class='iconfont icon-delete' @click='closeDetail'></span>
-    </div>
-  </div>
   </div>
 </template>
 <script>
+  import star from '../star/star.vue'
+
   export default {
     name: 'header',
+    components: {
+      'v-star': star
+    },
     data () {
       return {
         ifShowDetail: false,
@@ -73,33 +78,12 @@
       }
     },
     props: ['headerData'],
-    mounted () {
-      this.calcStars()
-    },
     methods: {
       closeDetail: function () {
         this.ifShowDetail = false
       },
       showDetail: function () {
         this.ifShowDetail = true
-      },
-      calcStars () { // 计算star三种状态个数
-        let rate = this.headerData.score
-        let integer = Math.floor(rate) // 整数部分
-        let redundant = rate % integer // 余数部分
-        if (redundant === 0) { // 余数为0
-          this.onNum = integer
-          this.halfNum = 0
-          this.offNum = 5 - integer
-        } else if (redundant > 0 && redundant <= 0.5) {
-          this.onNum = integer
-          this.halfNum = 1
-          this.offNum = 5 - integer - 1
-        } else if (redundant > 0.5) {
-          this.onNum = integer + 1
-          this.halfNum = 0
-          this.offNum = 5 - integer - 1
-        }
       }
     },
     computed: {
@@ -120,18 +104,7 @@
 </script>
 <style scoped>
   @import "../../common/iconfont/iconfont.css";
-  /*评分星星*/
-  .starOn {
-    background: url("./star24_on@2x.png") no-repeat;
-  }
 
-  .starHalf {
-    background: url("./star24_half@2x.png") no-repeat;
-  }
-
-  .starOff {
-    background: url("./star24_off@2x.png") no-repeat;
-  }
   /*活动图标*/
   .decrease {
     background: url("./decrease_4@2x.png") no-repeat;
@@ -152,6 +125,7 @@
   .special {
     background: url("./special_4@2x.png") no-repeat;
   }
+
   .headTop {
     height: 106px;
     position: relative;
@@ -306,18 +280,16 @@
     text-align: center;
     margin-bottom: 16px;
   }
-
-  .sellerDetail > .showStar {
+    
+  .starWrapper{
     width: 100%;
-    height: 24px;
-    padding:0 60px;
-    display: flex;
-    justify-content: space-between;
+    text-align: center;
   }
-  .showStar>li{
+
+  .showStar > li {
     width: 24px;
     height: 24px;
-    background-size:cover;
+    background-size: cover;
   }
 
   .discountMsg {
@@ -376,21 +348,24 @@
     line-height: 12px;
     margin-bottom: 12px;
   }
-  .discountList > li>i{
+
+  .discountList > li > i {
     display: inline-block;
     width: 16px;
     height: 16px;
     vertical-align: middle;
-    background-size:cover;
+    background-size: cover;
     margin-right: 6px;
   }
-  .discountList > li>span{
+
+  .discountList > li > span {
     font-size: 12px;
     font-weight: 200;
     line-height: 12px;
     margin-bottom: 12px;
     vertical-align: middle;
   }
+
   .sellerNotice {
     margin-top: 28px;
   }

@@ -17,6 +17,7 @@
       }
     },
     created () {
+      console.log(this.score)
       this.calcStars(this.score)
     },
     methods: {
@@ -58,7 +59,7 @@
   }
 
   #star {
-    display: inline-block;
+    display: inline-block!important;
     font-size: 12px;
     display: inline-block;
     width: 100px;
