@@ -17,7 +17,6 @@
       }
     },
     created () {
-      console.log(this.score)
       this.calcStars(this.score)
     },
     methods: {

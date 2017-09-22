@@ -280,7 +280,7 @@
     text-align: center;
     margin-bottom: 16px;
   }
-    
+
   .starWrapper{
     width: 100%;
     text-align: center;
