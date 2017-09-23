@@ -28,11 +28,6 @@
                     <span><i>¥</i>{{one.price}}</span>
                     <s v-if='one.oldPrice'>¥{{one.oldPrice}}</s>
                   </p>
-                  <!--<div class="buyBtn">
-                    <i class='iconfont icon-reduce' v-show='one.count' @click.stop='reduce(one)'></i>
-                    <span>{{one.count}}</span>
-                    <i class='iconfont icon-add' @click.stop="add(one)"></i>
-                  </div>-->
                   <v-order :one='one'></v-order>
                 </div>
               </div>
@@ -127,6 +122,17 @@
           }
         }
         return 0 // 都不符合，则说明在滚动到第一个了
+      },
+      selectFoods () { // 拿到已经选中的订单
+        let foods = []
+        this.foods.forEach((food) => {
+          food.foreach((one) => {
+            if (one.count) {
+              foods.push(one)
+            }
+          })
+        })
+        return foods
       }
     }
   }

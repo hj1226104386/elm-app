@@ -1,7 +1,7 @@
 <template>
   <div class="buyBtn">
     <i class='iconfont icon-reduce' v-show='one.count' @click.stop='reduce(one)'></i>
-    <span>{{one.count}}</span>
+    <span v-show='one.count>0'>{{one.count}}</span>
     <i class='iconfont icon-add' @click.stop="add(one)"></i>
   </div>
 </template>
