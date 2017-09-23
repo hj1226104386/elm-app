@@ -28,11 +28,12 @@
                     <span><i>¥</i>{{one.price}}</span>
                     <s v-if='one.oldPrice'>¥{{one.oldPrice}}</s>
                   </p>
-                  <div class="buyBtn">
-                    <i class='iconfont icon-reduce' v-show='one.count' @click='reduce(one)'></i>
+                  <!--<div class="buyBtn">
+                    <i class='iconfont icon-reduce' v-show='one.count' @click.stop='reduce(one)'></i>
                     <span>{{one.count}}</span>
-                    <i class='iconfont icon-add' @click="add(one)"></i>
-                  </div>
+                    <i class='iconfont icon-add' @click.stop="add(one)"></i>
+                  </div>-->
+                  <v-order :one='one'></v-order>
                 </div>
               </div>
             </li>
@@ -45,21 +46,21 @@
 </template>
 <script>
   import goodDetail from '../goodDetail/goodDetail.vue'
+  import order from '../order/order.vue'
   import BScroll from 'better-scroll'
 
   export default {
     name: 'goods',
     props: ['headerData'],
     components: {
-      'v-good-detail': goodDetail
+      'v-good-detail': goodDetail,
+      'v-order': order
     },
     data () {
       return {
         goods: '',
         listHeight: [], // 每个分类的li元素高度
         scrollY: '', // 实时存放右侧的scrollTop值
-        totalMoney: 0, // 计算订单总额
-        selectFoods: [],
         selectThis: '', // 点击单个商品，进入详情
         ifShowDetail: false // 是否显示详情
       }
@@ -110,61 +111,6 @@
         var currentLi = liList[index]
         this.foodsScroll.scrollToElement(currentLi, 300)
       },
-      add (one) { // 添加订单
-        if (!one.count) {
-          this.$set(one, 'count', 1)
-        } else {
-          one.count++
-        }
-        this.totalMoney += one.price
-        // 请求计算总金额
-        this.$store.commit('currentTotalMoney', this.totalMoney)
-        // 重新汇总所有的订单
-        this.calcSelectFoods(one, true)
-      },
-      reduce (one) {
-        if (one.count === 1) {
-          one.count = ''
-        } else {
-          one.count--
-        }
-        this.totalMoney -= one.price
-        // 请求计算总金额
-        this.$store.commit('currentTotalMoney', this.totalMoney)
-        // 重新汇总所有的订单
-        this.calcSelectFoods(one, false)
-      },
-      calcSelectFoods (one, add) { // 重新整理所有订单
-        /**
-         * 1、判断是否有相同订单，有，则更新count
-         * 2、无相同订单，再判断是增加订单还是减少订单
-         * 3、添加订单，则push进去
-         * 4、移除订单，则slice掉
-         */
-          // 1、遍历判断是否有相同订单
-        let sameFlag = false // 默认数组中没有相同订单
-        var that = this
-        for (let i = 0; i < this.selectFoods.length; i++) {
-          let v = that.selectFoods[i]
-          if (v.name === one.name) { // 已有相同订单
-            v.count = one.count // 更新count
-            sameFlag = true
-          }
-        }
-        // 2、添加新订单
-        if (!sameFlag && add) { // 没有相同订单
-          this.selectFoods.push(one)
-        }
-        // 3、移除掉count为0的订单
-        this.selectFoods.forEach(function (v, i) {
-          if (!v.count) {
-            that.selectFoods.splice(i, 1)
-          }
-        })
-        // 4、通知vuex更新数据
-        this.$store.commit('resetSelectFoods', this.selectFoods)
-        this.$store.commit('refreshAllFoods', this.foods)
-      },
       showDetail (msg) { // 点击商品进入详情
         this.selectThis = msg
         this.ifShowDetail = true
@@ -181,9 +127,6 @@
           }
         }
         return 0 // 都不符合，则说明在滚动到第一个了
-      },
-      getAllFoods () { // 获取最新的allFoods
-        return this.$store.state.allFoods
       }
     }
   }

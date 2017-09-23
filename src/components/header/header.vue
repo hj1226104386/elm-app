@@ -263,12 +263,11 @@
 
   .sellerDetail {
     width: 100%;
-    height: 100%;
     color: #fff;
     position: fixed;
     top: 0;
-    left: 0;
-    z-index: 55;
+    bottom:0;
+    z-index: 101;
     background-color: rgba(7, 17, 27, .8);
     padding: 64px 36px 32px;
   }
