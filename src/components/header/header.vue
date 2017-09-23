@@ -35,7 +35,7 @@
     <div class="sellerDetail animated bounceInRight" v-show='ifShowDetail'>
       <h2>{{headerData.name}}</h2>
       <div class="starWrapper">
-        <v-star :score="headerData.score"></v-star>
+        <v-star :score="headerData.score" v-if='headerData.score'></v-star>
       </div>
       <div class="discountMsg">
         <div class="discountTitle lineTitle">
@@ -281,7 +281,7 @@
     margin-bottom: 16px;
   }
 
-  .starWrapper{
+  .starWrapper {
     width: 100%;
     text-align: center;
   }

@@ -12,7 +12,7 @@
         <li v-for='item in goods' class='food-list-hook'>
           <h2 class='foodTitle'>{{item.name}}</h2>
           <ul class="foodList">
-            <li v-for='one in item.foods'>
+            <li v-for='one in item.foods' @click="showDetail(one)">
               <div class="goodPic">
                 <img :src="one.image">
               </div>
@@ -40,28 +40,34 @@
         </li>
       </ul>
     </div>
+    <v-good-detail :detailMsg='selectThis' v-if='ifShowDetail'></v-good-detail>
   </div>
 </template>
 <script>
+  import goodDetail from '../goodDetail/goodDetail.vue'
   import BScroll from 'better-scroll'
 
   export default {
     name: 'goods',
     props: ['headerData'],
+    components: {
+      'v-good-detail': goodDetail
+    },
     data () {
       return {
         goods: '',
         listHeight: [], // 每个分类的li元素高度
         scrollY: '', // 实时存放右侧的scrollTop值
         totalMoney: 0, // 计算订单总额
-        selectFoods: []
+        selectFoods: [],
+        selectThis: '', // 点击单个商品，进入详情
+        ifShowDetail: false // 是否显示详情
       }
     },
     created () {
       this.$http.get('/api/goods').then((res) => {
         if (res.body.errNum === 0) {
           this.goods = res.body.data
-          console.log(this.goods)
           // dom结构加载完成
           this.$nextTick(() => {
             // 初始化scroll
@@ -158,6 +164,10 @@
         // 4、通知vuex更新数据
         this.$store.commit('resetSelectFoods', this.selectFoods)
         this.$store.commit('refreshAllFoods', this.foods)
+      },
+      showDetail (msg) { // 点击商品进入详情
+        this.selectThis = msg
+        this.ifShowDetail = true
       }
     },
     computed: {
