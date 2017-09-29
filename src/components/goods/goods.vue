@@ -35,6 +35,8 @@
           </ul>
         </li>
       </ul>
+      <div class="pullLoad" v-if='showUPLoad'>数据更新中...</div>
+      <div class="pullDownLoad" v-if='showDownLoad'>上拉加载，数据更新中...</div>
     </div>
     <v-good-detail :detailMsg='selectThis' v-if='ifShowDetail'></v-good-detail>
   </div>
@@ -44,6 +46,7 @@
   import order from '../order/order.vue'
   import BScroll from 'better-scroll'
 
+  var loading = false // 正在加载中（节流阀）
   export default {
     name: 'goods',
     props: ['headerData'],
@@ -53,11 +56,13 @@
     },
     data () {
       return {
-        goods: '',
+        goods: [],
         listHeight: [], // 每个分类的li元素高度
         scrollY: '', // 实时存放右侧的scrollTop值
         selectThis: '', // 点击单个商品，进入详情
-        ifShowDetail: false // 是否显示详情
+        ifShowDetail: false, // 是否显示详情
+        showUPLoad: false, // 是否显示下拉刷新
+        showDownLoad: false // 是否显示上拉加载
       }
     },
     created () {
@@ -76,17 +81,57 @@
     },
     methods: {
       initScroll () { // 初始化BSscroll
+        var that = this
         this.menuScroll = new BScroll(this.$refs.menuWrapper, {
           click: true // 不阻止click事件
         })
         this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
           click: true, // 不阻止click事件
-          probeType: 3 // 滑动过程中派发scroll事件
+          probeType: 3, // 滑动过程中派发scroll事件
+          pullDownRefresh: {
+            threshold: 50, // 当下拉到超过顶部 50px 时，触发 pullingDown 事件
+            stop: 30 // 刷新数据的过程中，回弹停留在距离顶部还有 20px 的位置
+          },
+          pullUpLoad: {
+            threshold: -50 // 在上拉到超过底部 20px 时，触发 pullingUp 事件
+          }
         })
         // 动态获取y值
         this.foodsScroll.on('scroll', (pos) => {
           this.scrollY = Math.abs(Math.round(pos.y)) // 实时保存y值
         })
+        this.foodsScroll.on('pullingDown', () => {
+          if (!loading) {
+            this.showUPLoad = true
+            this.$http.get('/api/goods').then((res) => {
+              if (res.body.errNum === 0) {
+                console.log(res.body.data)
+                setTimeout(function () {
+                  that.showUPLoad = false
+                  // 在刷新数据完成之后，调用 finishPullDown 方法，回弹到顶部
+                  that.foodsScroll.finishPullDown()
+                }, 3000)
+                console.log('请求结束，数据更新完成')
+              }
+            })
+          }
+        })
+        /* this.foodsScroll.on('pullingUp', () => {
+          console.log('上拉距离超过50，触发pullingDown事件')
+          if (!loading) {
+            this.showDownLoad = true
+            this.$http.get('/api/goods').then((res) => {
+              if (res.body.errNum === 0) {
+                that.showDownLoad = false
+                // 在刷新数据完成之后，调用 finishPullDown 方法，回弹到顶部
+                that.foodsScroll.finishPullUp()
+                // 刷新BS，重新计算DOM
+                that.foodsScroll.refresh()
+                console.log('请求结束，上拉加载，数据更新完成')
+              }
+            })
+          }
+        }) */
       },
       calcHeight () { // 计算每个分类的li元素在页面的高度
         let liList = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook')
@@ -109,6 +154,49 @@
       showDetail (msg) { // 点击商品进入详情
         this.selectThis = msg
         this.ifShowDetail = true
+      },
+      upLoadData () { // 下拉刷新数据
+        var that = this
+        if (!this.foodsScroll) {
+          this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {})
+          this.foodsScroll.on('touchEnd', (pos) => {
+            // 下拉动作
+            if (pos.y > 50 && !loading) {
+              console.log('下拉高度超过50px，开始发送请求')
+              this.showUPLoad = true
+              loading = true
+              this.$http.get('/api/goods').then((res) => {
+                if (res.body.errNum === 0) {
+                  console.log(res.body.data)
+                  setTimeout(function () {
+                    that.showUPLoad = false
+                    loading = false
+                  }, 50000)
+                  console.log('请求结束，数据更新完成')
+                }
+              })
+            }
+          })
+        } else {
+          this.foodsScroll.on('touchEnd', (pos) => {
+            // 下拉动作
+            if (pos.y > 50 && !loading) {
+              console.log('下拉高度超过50px，开始发送请求')
+              this.showUPLoad = true
+              loading = true
+              this.$http.get('/api/goods').then((res) => {
+                if (res.body.errNum === 0) {
+                  console.log(res.body.data)
+                  setTimeout(function () {
+                    that.showUPLoad = false
+                    loading = false
+                  }, 3000)
+                  console.log('请求结束，数据更新完成')
+                }
+              })
+            }
+          })
+        }
       }
     },
     computed: {
@@ -145,6 +233,30 @@
 
   .current > span {
     color: #fff !important;
+  }
+
+  .pullLoad {
+    height: 30px;
+    top: 174px;
+    text-align: center;
+    line-height: 30px;
+    background-color: orange;
+    position: fixed;
+    top: 174px;
+    left: 80px;
+    right: 0;
+  }
+
+  .pullDownLoad {
+    width: 100%;
+    height: 30px;
+    top: 174px;
+    text-align: center;
+    line-height: 30px;
+    background-color: orange;
+    position: fixed;
+    bottom: 46px;
+    left: 80px;
   }
 
   #goods {
@@ -192,6 +304,7 @@
 
   .contentMenu {
     flex: 1;
+    position: relative;
   }
 
   .contentMenu > .typeList {
